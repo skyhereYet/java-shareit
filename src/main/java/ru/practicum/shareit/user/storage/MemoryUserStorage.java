@@ -65,7 +65,7 @@ public class MemoryUserStorage implements UserStorage {
             return false;
         } else if (list.get(0).getId() == user.getId()) {
             return false;
-        }else {
+        } else {
             return true;
         }
     }
