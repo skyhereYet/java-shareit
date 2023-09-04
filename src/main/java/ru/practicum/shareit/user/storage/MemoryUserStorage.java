@@ -4,16 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.user.model.User;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class MemoryUserStorage implements UserStorage {
     private static final Logger log = LoggerFactory.getLogger(MemoryUserStorage.class);
-    private final HashMap<Integer, User> userStorage = new HashMap<>();
+    private final Map<Integer, User> userStorage = new HashMap<>();
 
 
     @Override
@@ -31,11 +29,9 @@ public class MemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User delete(int id) {
-        User userToReturn = getUserById(id).get();
+    public void delete(int id) {
         userStorage.remove(id);
-        log.info("Successfully delete user - " + userToReturn);
-        return userToReturn;
+        log.info("Successfully delete user - " + id);
     }
 
     @Override

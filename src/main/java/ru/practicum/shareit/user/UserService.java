@@ -47,7 +47,8 @@ public class UserService {
     public User deleteOrThrow(int id) {
         Optional<User> userO = userStorage.getUserById(id);
         if (userO.isPresent()) {
-            return userStorage.delete(id);
+            userStorage.delete(id);
+            return userO.orElseThrow(() -> new UserExistException("User not found id - " + id));
         } else {
             log.info("User not exist in the storage with id - " + id);
             throw new UserExistException("User not exist in the storage with id - " + id);
@@ -57,7 +58,8 @@ public class UserService {
     public User getUserByIdOrThrow(int id) {
         try {
             Optional<User> userO = userStorage.getUserById(id);
-            log.info("Return user - " + userO.get());
+            log.info("Return user - " + userO.orElseThrow(() -> new UserExistException("User with id = " + id
+                    + " not exist")));
             return userO.orElseThrow(() -> new UserExistException("User with id = " + id + " not exist"));
         } catch (NullPointerException e) {
             throw new UserExistException("User with id = " + id + " not exist");

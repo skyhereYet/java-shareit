@@ -46,7 +46,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto updateItem(ItemDto itemDto, int itemId, int userId) {
         User user = userService.getUserByIdOrThrow(userId);
         Optional<Item> itemO = itemStorage.getItemById(itemId);
-        if (user != itemO.get().getOwner()) {
+        if (user != getItemFromOptionalOrThrow(itemO, itemId).getOwner()) {
             throw new ItemExistException("User is not correct for item. (user ID = " + userId
                                             + ", item ID = " + itemId);
         }
@@ -57,14 +57,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getItemByIdOrThrow(int id) {
-        try {
-            Optional<Item> itemO = itemStorage.getItemById(id);
-            log.info("Return item - " + itemO.get());
-            return itemO.orElseThrow(() -> new ItemExistException("Item with id = " + id + " not exist"));
-        } catch (NullPointerException e) {
-            throw new ItemExistException("Item with id = " + id + " not exist");
-        }
+    public Item getItemByIdOrThrow(int itemId) {
+            Optional<Item> itemO = itemStorage.getItemById(itemId);
+            log.info("Return item - " + getItemFromOptionalOrThrow(itemO, itemId));
+            return getItemFromOptionalOrThrow(itemO, itemId);
     }
 
     @Override
@@ -82,8 +78,8 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto getItemDtoByIdOrThrow(int itemId) {
         Optional<Item> itemO = itemStorage.getItemById(itemId);
-        log.info("Succesfully found item: " + itemO.get());
-        return itemMapper.toItemDto(itemO.get());
+        log.info("Succesfully found item: " + getItemFromOptionalOrThrow(itemO, itemId));
+        return itemMapper.toItemDto(getItemFromOptionalOrThrow(itemO, itemId));
     }
 
     @Override
@@ -114,5 +110,9 @@ public class ItemServiceImpl implements ItemService {
             itemDto.setAvailable(itemO.get().getAvailable());
         }
         return itemDto;
+    }
+
+    private Item getItemFromOptionalOrThrow(Optional<Item> itemO, int id) {
+        return itemO.orElseThrow(() -> new ItemExistException("Item with id = " + id + " not exist"));
     }
 }

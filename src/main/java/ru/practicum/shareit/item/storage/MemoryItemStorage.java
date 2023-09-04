@@ -37,7 +37,10 @@ public class MemoryItemStorage implements ItemStorage {
     @Override
     public Optional<Item> getItemById(int id) {
         log.info("Get item by id - " + id);
-        return Optional.of(itemStorage.get(id));
+        if (itemStorage.containsKey(id)) {
+            return Optional.of(itemStorage.get(id));
+        }
+        return Optional.empty();
     }
 
     @Override
