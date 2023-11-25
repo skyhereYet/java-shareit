@@ -1,38 +1,31 @@
 package ru.practicum.shareit.user.model;
 
-import lombok.Data;
+import lombok.*;
 import ru.practicum.shareit.util.Create;
 import ru.practicum.shareit.util.Update;
 
+import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Objects;
 
-/**
- * TODO Sprint add-controllers.
- */
-@Data
+@Entity
+@Getter
+@Setter
+@Table(name = "users")
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @NotEmpty(groups = {Create.class})
     @NotNull(groups = {Create.class})
+    @Column(name = "name")
     private String name;
     @Email(groups = {Create.class, Update.class})
     @NotEmpty(groups = {Create.class})
     @NotNull(groups = {Create.class})
+    @Column(name = "email")
     private String email;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(name, user.name) && Objects.equals(email, user.email);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, email);
-    }
 }

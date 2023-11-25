@@ -1,13 +1,27 @@
 package ru.practicum.shareit.request;
 
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.*;
 import ru.practicum.shareit.user.model.User;
+
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@Entity
+@Table(name = "requests")
+@RequiredArgsConstructor
 public class ItemRequest {
-    private final int id;
-    private final String description;
-    private final User requestor;
-    private final LocalDateTime created;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    @Column(name = "description")
+    private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "requestor_id")
+    private User requestor;
+    @Column(name = "created")
+    @JsonFormat(pattern = "yyyy-MM-data'HH:mm:ss")
+    private LocalDateTime created;
 }

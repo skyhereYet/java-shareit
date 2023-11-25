@@ -56,7 +56,9 @@ public class MemoryUserStorage implements UserStorage {
 
     @Override
     public Boolean emailExist(User user) {
-        List<User> list = userStorage.values().stream().filter(u -> u.getEmail().equals(user.getEmail())).collect(Collectors.toList());
+        List<User> list = userStorage.values().stream()
+                .filter(u -> u.getEmail().equals(user.getEmail()))
+                .collect(Collectors.toList());
         if (list.isEmpty()) {
             return false;
         } else if (list.get(0).getId() == user.getId()) {

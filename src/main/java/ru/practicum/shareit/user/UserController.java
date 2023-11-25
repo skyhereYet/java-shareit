@@ -4,7 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.util.Create;
 import ru.practicum.shareit.util.Update;
 
@@ -21,32 +22,31 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Validated({Create.class}) @RequestBody User user) {
-        log.info("POST request. User create: " + user.toString());
-        return userService.createOrThrow(user);
+    public UserDto create(@Validated({Create.class}) @RequestBody UserDto userDto) {
+        log.info("POST request. User create: " + userDto.toString());
+        return userService.createOrThrow(userDto);
     }
 
     @PatchMapping(value = "/{id}")
-    public User update(@Validated({Update.class}) @RequestBody User user, @PathVariable int id) {
-        user.setId(id);
-        log.info("Patch request. User update: " + user);
-        return userService.updateOrThrow(user);
+    public UserDto update(@Validated({Update.class}) @RequestBody UserDto userDto, @PathVariable int id) {
+        log.info("Patch request. User update: " + userDto);
+        return userService.updateOrThrow(userDto, id);
     }
 
     @GetMapping
-    public List<User> getUsers() {
+    public List<UserDto> getUsers() {
         log.info("GET request. Get all users");
         return userService.getUsers();
     }
 
     @GetMapping(value = "/{id}")
-    public User getUserById(@PathVariable int id) {
+    public UserDto getUserById(@PathVariable int id) {
         log.info("GET request. Get user by ID - " + id);
         return userService.getUserByIdOrThrow(id);
     }
 
     @DeleteMapping(value = "/{id}")
-    public User deleteUserById(@PathVariable int id) {
+    public UserDto deleteUserById(@PathVariable int id) {
         log.info("DELETE request. Delete user by ID - " + id);
         return userService.deleteOrThrow(id);
     }
