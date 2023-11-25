@@ -78,7 +78,7 @@ public class ItemServiceDao implements ItemService {
         List<Booking> bookingList = bookingRepository.findAllByItemOwnerStartDesc(userId);
         List<Comment> comments = new ArrayList<>();//commentRepository.findCommentByAuthorOrderByCreated()
         return items.stream()
-                .sorted(Comparator.comparingInt(Item :: getId))
+                .sorted(Comparator.comparingInt(Item::getId))
                 .map(i -> ItemMapper.toItemInfoDto(i, bookingList, comments))
                 .collect(Collectors.toList());
     }
@@ -103,7 +103,7 @@ public class ItemServiceDao implements ItemService {
         text = "%" + text + "%";
         return itemRepository.findItemsByRequest(text)
                 .stream()
-                .map(ItemMapper :: toItemDto)
+                .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
