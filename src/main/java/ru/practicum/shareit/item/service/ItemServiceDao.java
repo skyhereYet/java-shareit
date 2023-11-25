@@ -78,7 +78,7 @@ public class ItemServiceDao implements ItemService {
         List<Booking> bookingList = bookingRepository.findAllByItemOwnerStartDesc(userId);
         List<Comment> comments = new ArrayList<>();//commentRepository.findCommentByAuthorOrderByCreated()
         return items.stream()
-                .sorted(Comparator.comparingInt(Item ::getId))
+                .sorted(Comparator.comparingInt(Item :: getId))
                 .map(i -> ItemMapper.toItemInfoDto(i, bookingList, comments))
                 .collect(Collectors.toList());
     }
@@ -116,11 +116,9 @@ public class ItemServiceDao implements ItemService {
                 .orElseThrow(() -> new UserExistException("User not exist in the repository, ID = "  + userId));
         List<Booking> bookingList = bookingRepository
                 .findAllByItemAndBookerAndEndBeforeOrderByStart(userId, itemId, LocalDateTime.now());
-        boolean bookerExist = false;
         if (!bookingList.isEmpty()) {
             for (Booking booker : bookingList) {
                 if (booker.getEnd().isBefore(LocalDateTime.now())) {
-                    bookerExist = true;
                     break;
                 }
             }
