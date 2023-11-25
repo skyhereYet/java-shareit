@@ -103,7 +103,7 @@ public class ItemServiceDao implements ItemService {
         text = "%" + text + "%";
         return itemRepository.findItemsByRequest(text)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(ItemMapper :: toItemDto)
                 .collect(Collectors.toList());
     }
 
