@@ -3,7 +3,6 @@ package ru.practicum.shareit.item;
 import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Comment;
@@ -38,7 +37,7 @@ public class ItemMapper {
         itemInfoDto.setName(item.getName());
         itemInfoDto.setDescription(item.getDescription());
         itemInfoDto.setAvailable(item.getAvailable());
-        itemInfoDto.setComments(comments.stream().map(CommentDto::toCommentDto).collect(Collectors.toList()));
+        itemInfoDto.setComments(comments.stream().map(CommentMapper::toCommentDto).collect(Collectors.toList()));
         if (booking.isEmpty()) {
             return itemInfoDto;
         }

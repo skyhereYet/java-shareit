@@ -26,14 +26,14 @@ public class BookingController {
     }
 
     @PostMapping
-    public BookingDtoInfo createBooking(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public BookingDtoInfo createBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                                         @Validated({Create.class}) @RequestBody BookingDto bookingDto) {
         log.info("POST request. Create booking. User ID - " + userId + ", BookingDto = " + bookingDto);
         return bookingService.createBooking(bookingDto, userId);
     }
 
     @PatchMapping(value = "/{bookingId}")
-    public BookingDtoInfo updateBooking(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public BookingDtoInfo updateBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                                         @PathVariable int bookingId,
                                         @RequestParam Boolean approved) {
         log.info("PATCH request. Approved - " + approved + ", userId - " + userId + ", booking ID " + bookingId);
@@ -41,21 +41,21 @@ public class BookingController {
     }
 
     @GetMapping(value = "/{bookingId}")
-    public BookingDtoInfo getBooking(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public BookingDtoInfo getBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                                         @PathVariable int bookingId) {
         log.info("GET request. user ID - " + userId + ", booking ID " + bookingId);
         return bookingService.getBooking(bookingId, userId);
     }
 
     @GetMapping
-    public List<BookingDtoInfo> getBookingByUserIdAndState(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public List<BookingDtoInfo> getBookingByUserIdAndState(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                                                            @RequestParam(defaultValue = "ALL") String state) {
         log.info("GET request. user ID - " + userId);
         return bookingService.getBookingByUserIdAndState(userId, state);
     }
 
     @GetMapping(value = "/owner")
-    public List<BookingDtoInfo> getBookingByOwner(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public List<BookingDtoInfo> getBookingByOwner(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                                                     @RequestParam(defaultValue = "ALL") String state) {
         log.info("GET request. user ID - " + userId + " state - " + state);
         return bookingService.getBookingByOwnerAndState(userId, state);

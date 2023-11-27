@@ -17,7 +17,6 @@ import ru.practicum.shareit.exception.BookingPropertiesException;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -58,7 +57,7 @@ public class BookingServiceDao implements BookingService {
     public BookingDtoInfo updateBooking(int bookingId, int userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingExistException("Booking with ID - " + bookingId + " not found"));
-        UserDto userDto = userService.getUserByIdOrThrow(userId);
+        userService.getUserByIdOrThrow(userId);
         if (booking.getItem().getOwner().getId() != userId) {
             throw new UserExistException("Error: owner ID does not match user ID");
         }
@@ -85,7 +84,7 @@ public class BookingServiceDao implements BookingService {
 
     @Override
     public List<BookingDtoInfo> getBookingByUserIdAndState(int userId, String stateString) {
-        UserDto userDto = userService.getUserByIdOrThrow(userId);
+        userService.getUserByIdOrThrow(userId);
         State state = State.checkState(stateString);
         if (state.equals(State.ALL)) {
             return bookingRepository.findAllByBooker(userId)
@@ -119,7 +118,7 @@ public class BookingServiceDao implements BookingService {
 
     @Override
     public List<BookingDtoInfo> getBookingByOwnerAndState(int userId, String stateString) {
-        UserDto userDto = userService.getUserByIdOrThrow(userId);
+        userService.getUserByIdOrThrow(userId);
         State state = State.checkState(stateString);
         if (state.equals(State.ALL)) {
             return bookingRepository.findAllByItemOwnerStartDesc(userId)

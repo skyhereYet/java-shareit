@@ -28,14 +28,14 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public ItemDto createItem(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                               @Validated({Create.class}) @RequestBody ItemDto itemDto) {
         log.info("POST request. Create item. User ID - " + userId + ", itemDto = " + itemDto);
         return itemService.createItem(itemDto, userId);
     }
 
     @PatchMapping(value = "/{itemId}")
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
+    public ItemDto update(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
                           @Validated({Update.class}) @RequestBody ItemDto itemDto,
                           @PathVariable int itemId) {
         log.info("PATCH request. Update item. User ID - " + userId + ", itemDto = " + itemDto);
@@ -43,14 +43,14 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemInfoDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId) {
+    public List<ItemInfoDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId) {
         log.info("GET request. Get items by user ID - " + userId);
         return itemService.getItemsInfoDtoByUserId(userId);
     }
 
     @GetMapping(value = "/{itemId}")
     public ItemInfoDto getItemById(@PathVariable int itemId,
-                                   @RequestHeader("X-Sharer-User-Id") @Min(0) int userId) {
+                                   @RequestHeader("X-Sharer-User-Id") @Min(1) int userId) {
         log.info("GET request (getItemById). Get items by item ID - " + itemId + ", user ID - " + userId);
         return itemService.getItemInfoDtoByIdOrThrow(itemId, userId);
     }
@@ -62,8 +62,8 @@ public class ItemController {
     }
 
     @PostMapping(value = "/{itemId}/comment")
-    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") @Min(0) int userId,
-                                    @PathVariable @Min(0) int itemId,
+    public CommentDto createComment(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
+                                    @PathVariable @Min(1) int itemId,
                                     @Validated({Create.class}) @RequestBody CommentDto commentDto) {
         log.info("POST request. Create comment. User ID - " + userId + ", commentDto = " + commentDto);
         return itemService.createComment(itemId, userId, commentDto);

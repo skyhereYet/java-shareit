@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.InvalidCommentRequestException;
 import ru.practicum.shareit.exception.ItemExistException;
 import ru.practicum.shareit.exception.UserExistException;
+import ru.practicum.shareit.item.CommentMapper;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -22,9 +23,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,7 +48,7 @@ public class ItemServiceDao implements ItemService {
     @Transactional(readOnly = false)
     @Override
     public ItemDto updateItem(ItemDto itemDto, int itemId, int userId) {
-        User owner = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new UserExistException("User not exist in the repository, ID = "  + userId));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ItemExistException("Item not exist in the repository, ID = "  + itemId));
@@ -125,12 +124,6 @@ public class ItemServiceDao implements ItemService {
         } else {
             throw new InvalidCommentRequestException("User not booking item");
         }
-        Comment comment = new Comment();
-        comment.setText(commentDto.getText());
-        comment.setItem(item);
-        comment.setAuthor(author);
-        comment.setCreated(LocalDateTime.now());
-        Comment toReturn = commentRepository.save(comment);
-        return CommentDto.toCommentDto(toReturn);
+        return CommentMapper.toCommentDto(commentRepository.save(CommentMapper.toComment(commentDto, item, author)));
     }
 }
