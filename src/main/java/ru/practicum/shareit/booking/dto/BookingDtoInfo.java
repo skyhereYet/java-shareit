@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.util.Create;
 
 import javax.validation.constraints.Future;
@@ -16,16 +18,14 @@ import java.time.LocalDateTime;
 @Setter
 @RequiredArgsConstructor
 @AllArgsConstructor
-public class BookingDto {
+public class BookingDtoInfo {
     @NotNull(groups = {Create.class})
     private int id;
     @FutureOrPresent(groups = {Create.class})
-    @NotNull(groups = {Create.class})
     private LocalDateTime start;
     @Future(groups = {Create.class})
-    @NotNull(groups = {Create.class})
     private LocalDateTime end;
-    private int itemId;
-    private int bookerId;
+    private Item item;
+    private User booker;
     private BookingStatus status;
 }

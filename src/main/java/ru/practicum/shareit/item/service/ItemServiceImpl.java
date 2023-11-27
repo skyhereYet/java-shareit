@@ -1,15 +1,18 @@
-package ru.practicum.shareit.item;
-
+package ru.practicum.shareit.item.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ItemExistException;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemInfoDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.ItemStorage;
-import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
@@ -18,15 +21,15 @@ import java.util.Optional;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private static final Logger log = LoggerFactory.getLogger(UserService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private final ItemStorage itemStorage;
-    private final UserService userService;
+    private final UserServiceImpl userService;
     private final ItemMapper itemMapper;
 
     private int id = 1;
 
-    public ItemServiceImpl(ItemStorage itemStorage, UserService userService, ItemMapper itemMapper) {
+    public ItemServiceImpl(ItemStorage itemStorage, UserServiceImpl userService, ItemMapper itemMapper) {
         this.itemStorage = itemStorage;
         this.userService = userService;
         this.itemMapper = itemMapper;
@@ -34,26 +37,26 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto createItem(ItemDto itemDto, int userId) {
-        User user = userService.getUserByIdOrThrow(userId);
-        Item item = itemMapper.toItem(itemDto, user);
+        User user = UserMapper.toUser(userService.getUserByIdOrThrow(userId));
+        Item item = ItemMapper.toItem(itemDto, user, null);
         item.setId(id++);
         Item itemToReturn = itemStorage.createItem(item);
         log.info("Succesfully item created and saved: " + itemToReturn);
-        return itemMapper.toItemDto(itemToReturn);
+        return ItemMapper.toItemDto(itemToReturn);
     }
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, int itemId, int userId) {
-        User user = userService.getUserByIdOrThrow(userId);
+        User user = UserMapper.toUser(userService.getUserByIdOrThrow(userId));
         Optional<Item> itemO = itemStorage.getItemById(itemId);
         if (user != getItemFromOptionalOrThrow(itemO, itemId).getOwner()) {
             throw new ItemExistException("User is not correct for item. (user ID = " + userId
                                             + ", item ID = " + itemId);
         }
-        Item item = itemMapper.toItem(checkItemDtoField(itemDto, itemId, itemO), user);
+        Item item = itemMapper.toItem(checkItemDtoField(itemDto, itemId, itemO), user, null);
         Item itemToReturn = itemStorage.updateItem(item);
         log.info("Succesfully item update and saved: " + itemToReturn);
-        return itemMapper.toItemDto(itemToReturn);
+        return ItemMapper.toItemDto(itemToReturn);
     }
 
     @Override
@@ -64,22 +67,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsByUserId(int userId) {
+    public List<ItemInfoDto> getItemsInfoDtoByUserId(int userId) {
         userService.getUserByIdOrThrow(userId);
         List<Item> items = itemStorage.getItemsByUserId(userId);
-        List<ItemDto> itemsDto = new ArrayList<>();
+        List<ItemInfoDto> itemsInfoDto = new ArrayList<>();
         for (Item item : items) {
-            itemsDto.add(itemMapper.toItemDto(item));
+            itemsInfoDto.add(ItemMapper.toItemInfoDto(item, new ArrayList<>(), new ArrayList<>()));
         }
         log.info("Return item list: " + items);
-        return itemsDto;
+        return itemsInfoDto;
     }
 
     @Override
-    public ItemDto getItemDtoByIdOrThrow(int itemId) {
+    public ItemInfoDto getItemInfoDtoByIdOrThrow(int itemId, int userId) {
         Optional<Item> itemO = itemStorage.getItemById(itemId);
         log.info("Succesfully found item: " + getItemFromOptionalOrThrow(itemO, itemId));
-        return itemMapper.toItemDto(getItemFromOptionalOrThrow(itemO, itemId));
+        return ItemMapper.toItemInfoDto(getItemFromOptionalOrThrow(itemO, itemId), new ArrayList<>(), new ArrayList<>());
     }
 
     @Override
@@ -92,10 +95,15 @@ public class ItemServiceImpl implements ItemService {
         log.info("Succesfully found items: " + items);
         List<ItemDto> itemsDto = new ArrayList<>();
         for (Item item : items) {
-            itemsDto.add(itemMapper.toItemDto(item));
+            itemsDto.add(ItemMapper.toItemDto(item));
         }
         log.info("Return items list: " + items);
         return itemsDto;
+    }
+
+    @Override
+    public CommentDto createComment(int itemId, int userId, CommentDto commentDto) {
+        return null;
     }
 
     private ItemDto checkItemDtoField(ItemDto itemDto, int itemId, Optional<Item> itemO) {

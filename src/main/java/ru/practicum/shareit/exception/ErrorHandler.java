@@ -32,4 +32,32 @@ public class ErrorHandler {
         log.warn("Error caught: 409, " + e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleBookingPropertiesException(final BookingPropertiesException e) {
+        log.warn("Error caught: 400, " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ErrorResponse handleBookingExistException(final BookingExistException e) {
+        log.warn("Error caught: 404, " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleStateCheckException(final StateCheckException e) {
+        log.warn("Error caught: 400, " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleInvalidCommentRequestException(final InvalidCommentRequestException e) {
+        log.warn("Error caught: 400, " + e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
 }
