@@ -9,4 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ErrorResponse {
     private final String error;
-    private final String stackTrace;}
+    private final String stackTrace;
+}

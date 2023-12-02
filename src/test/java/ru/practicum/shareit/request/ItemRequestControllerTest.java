@@ -51,7 +51,7 @@ class ItemRequestControllerTest {
         ItemRequest itemRequest = new ItemRequest(
                 1,
                 "Test request description",
-                new User (1, "User","user@email.com"),
+                new User(1, "User","user@email.com"),
                 LocalDateTime.now()
         );
 
@@ -77,7 +77,7 @@ class ItemRequestControllerTest {
         ItemRequest itemRequest = new ItemRequest(
                 1,
                 "Test request description",
-                new User (1, "User","user@email.com"),
+                new User(1, "User","user@email.com"),
                 LocalDateTime.now()
         );
 
