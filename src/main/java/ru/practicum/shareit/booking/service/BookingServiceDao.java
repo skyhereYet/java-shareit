@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.State;
@@ -83,68 +84,68 @@ public class BookingServiceDao implements BookingService {
     }
 
     @Override
-    public List<BookingDtoInfo> getBookingByUserIdAndState(int userId, String stateString) {
+    public List<BookingDtoInfo> getBookingByUserIdAndState(int userId, String stateString, Pageable pageable) {
         userService.getUserByIdOrThrow(userId);
         State state = State.checkState(stateString);
         if (state.equals(State.ALL)) {
-            return bookingRepository.findAllByBooker(userId)
+            return bookingRepository.findAllByBooker(userId, pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.FUTURE)) {
-            return bookingRepository.findAllByBookerAndStartGreaterThan(userId, LocalDateTime.now())
+            return bookingRepository.findAllByBookerAndStartGreaterThan(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.PAST)) {
-            return bookingRepository.findAllByBookerAndStartBefore(userId, LocalDateTime.now())
+            return bookingRepository.findAllByBookerAndStartBefore(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.CURRENT)) {
-            return bookingRepository.findAllByBookerAndCurrent(userId, LocalDateTime.now())
+            return bookingRepository.findAllByBookerAndCurrent(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
-        return bookingRepository.findAllByBookerAndStatus(userId, BookingStatus.toBookingStatus(state))
+        return bookingRepository.findAllByBookerAndStatus(userId, BookingStatus.toBookingStatus(state), pageable)
                 .stream()
                 .map(BookingMapper::toBookingDtoInfo)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public List<BookingDtoInfo> getBookingByOwnerAndState(int userId, String stateString) {
+    public List<BookingDtoInfo> getBookingByOwnerAndState(int userId, String stateString, Pageable pageable) {
         userService.getUserByIdOrThrow(userId);
         State state = State.checkState(stateString);
         if (state.equals(State.ALL)) {
-            return bookingRepository.findAllByItemOwnerStartDesc(userId)
+            return bookingRepository.findAllByItemOwnerStartDescPageable(userId, pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.FUTURE)) {
-            return bookingRepository.findAllByItemOwnerAndStartGreaterThanOrderByStart(userId, LocalDateTime.now())
+            return bookingRepository.findAllByItemOwnerAndStartGreaterThanOrderByStart(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.PAST)) {
-            return bookingRepository.findAllByItemOwnerAndStartBefore(userId, LocalDateTime.now())
+            return bookingRepository.findAllByItemOwnerAndStartBefore(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
         if (state.equals(State.CURRENT)) {
-            return bookingRepository.findAllByItemOwnerAndCurrent(userId, LocalDateTime.now())
+            return bookingRepository.findAllByItemOwnerAndCurrent(userId, LocalDateTime.now(), pageable)
                     .stream()
                     .map(BookingMapper::toBookingDtoInfo)
                     .collect(Collectors.toList());
         }
-        return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.toBookingStatus(state)).stream()
+        return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.toBookingStatus(state), pageable).stream()
                 .map(BookingMapper::toBookingDtoInfo)
                 .collect(Collectors.toList());
     }

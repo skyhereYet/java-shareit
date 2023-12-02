@@ -17,4 +17,9 @@ public interface ItemRepository extends JpaRepository<Item, Integer> {
             "where (lower(i.description) like lower(:text) OR lower(i.name) like lower(:text))" +
             "and i.available = true")
     List<Item> findItemsByRequest(String text);
+
+    @Query("select i " +
+            "from Item as i " +
+            "where i.itemRequest.id in :itemRequestList")
+    List<Item> findAllByItemRequestId(List<Integer> itemRequestList);
 }
