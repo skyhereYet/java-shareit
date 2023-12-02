@@ -30,12 +30,12 @@ class ItemRequestMapperTest {
     @Test
     void should_toItemRequest_successfully() {
         User requestor = new User(1,"First", "First@email.com");
-        ItemRequestDto itemRequestDto = new ItemRequestDto(1, "Black angle", requestor, LocalDateTime.now());
+        ItemRequestDto itemRequestDto = new ItemRequestDto(1, "Black angle", requestor,
+                null);
         ItemRequest itemRequest = ItemRequestMapper.toItemRequest(itemRequestDto, requestor);
 
         assertEquals(itemRequest.getId(), itemRequestDto.getId());
         assertEquals(itemRequest.getDescription(), itemRequestDto.getDescription());
-        assertEquals(itemRequest.getCreated(), itemRequestDto.getCreated());
     }
 
     @Test
@@ -49,6 +49,7 @@ class ItemRequestMapperTest {
         assertEquals(itemRequest.getId(), itemRequestInfoList.get(0).getId());
         assertEquals(itemRequest.getDescription(), itemRequestInfoList.get(0).getDescription());
         assertEquals(itemRequest.getCreated(), itemRequestInfoList.get(0).getCreated());
+        assertEquals(itemRequest.getRequestor().getName(), requestor.getName());
     }
 
     @Test

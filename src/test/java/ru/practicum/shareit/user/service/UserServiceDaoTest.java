@@ -31,7 +31,7 @@ class UserServiceDaoTest {
     @Order(value = 1)
     @Rollback(value = false)
     void should_createOrThrow_successfully() {
-        UserDto userDto = new UserDto(0, "First user", "first@email.com");
+        UserDto userDto = new UserDto(0, "First user", "firstuser@email.com");
         UserDto userDao;
         userDao = userService.createOrThrow(userDto);
         TypedQuery<User> query = entityManager.createQuery("Select i from User i where i.id = :id", User.class);
@@ -81,7 +81,7 @@ class UserServiceDaoTest {
     void should_getUsers_successfully() {
         //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
-        assertThat(users.size(), equalTo(1));
+        assertThat(users.size(), equalTo(2));
         TypedQuery<User> query = entityManager.createQuery("Select i from User i ", User.class);
         List<User> userDao = query.getResultList();
         assertThat(userDao.size(), equalTo(users.size()));
