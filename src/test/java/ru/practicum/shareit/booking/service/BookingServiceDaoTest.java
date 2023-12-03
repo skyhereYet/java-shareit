@@ -15,6 +15,7 @@ import ru.practicum.shareit.exception.BookingExistException;
 import ru.practicum.shareit.exception.BookingPropertiesException;
 import ru.practicum.shareit.exception.StateCheckException;
 import ru.practicum.shareit.exception.UserExistException;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemServiceDao;
@@ -32,6 +33,7 @@ import java.util.Random;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -66,7 +68,7 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 1)
     @DisplayName("ItemRequestServiceDao: method - createBooking (should_createBooking_successfully)")
-    @Rollback(false)
+    @Rollback(true)
     void should_createBooking_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();
@@ -74,7 +76,8 @@ class BookingServiceDaoTest {
         bookingDto.setStatus(BookingStatus.WAITING);
         bookingDto.setStart(LocalDateTime.now());
         int userId = userRepository.findAll().get(1).getId();
-        int itemId = itemRepository.findAll().get(0).getId();
+        Item item = itemRepository.findAll().get(0);
+        int itemId = item.getId();
         bookingDto.setItemId(itemId);
 
         BookingDtoInfo bookingDtoInfo = bookingService.createBooking(bookingDto, userId);
@@ -87,6 +90,32 @@ class BookingServiceDaoTest {
         assertThat(booker.getEnd(), equalTo(bookingDtoInfo.getEnd()));
         assertThat(booker.getItem(), equalTo(bookingDtoInfo.getItem()));
         assertThat(booker.getBooker(), equalTo(bookingDtoInfo.getBooker()));
+
+        bookingDto.setBookerId(item.getOwner().getId());
+        assertThrows(BookingExistException.class, () -> {
+            bookingService.createBooking(bookingDto, item.getOwner().getId());
+        });
+
+        bookingDto.setEnd(LocalDateTime.of(2023,12,12,12,00));
+        bookingDto.setStart(LocalDateTime.of(2023,12,12,12,00));
+        assertThrows(BookingPropertiesException.class, () -> {
+            bookingService.createBooking(bookingDto, userId);
+        });
+
+        bookingDto.setEnd(LocalDateTime.of(2023,12,12,11,00));
+        bookingDto.setStart(LocalDateTime.of(2023,12,12,12,00));
+        assertThrows(BookingPropertiesException.class, () -> {
+            bookingService.createBooking(bookingDto, userId);
+        });
+
+        item.setAvailable(false);
+        itemService.updateItem(ItemMapper.toItemDto(item), item.getId(), item.getOwner().getId());
+        assertThrows(BookingPropertiesException.class, () -> {
+            bookingService.createBooking(bookingDto, userId);
+        });
+
+        item.setAvailable(true);
+        itemService.updateItem(ItemMapper.toItemDto(item), item.getId(), item.getOwner().getId());
     }
 
     @Test
@@ -111,24 +140,20 @@ class BookingServiceDaoTest {
         Booking booker = query.setParameter("id", bookingDtoInfo.getId()).getSingleResult();
 
         assertThat(booker.getStatus(), equalTo(bookingDtoInfo.getStatus()));
-        Assertions.assertThrows(UserExistException.class, () -> {
+        assertThrows(UserExistException.class, () -> {
             bookingService.updateBooking(bookerId, userId, true);
         });
 
-        Assertions.assertThrows(BookingPropertiesException.class, () -> {
+        assertThrows(BookingPropertiesException.class, () -> {
             bookingService.updateBooking(bookerId, userIdNew, false);
         });
-        Assertions.assertThrows(UserExistException.class, () -> {
+        assertThrows(UserExistException.class, () -> {
             bookingService.updateBooking(bookerId, 1111, true);
         });
         ItemDto itemDto = new ItemDto();
-        itemDto.setAvailable(false);
-        itemService.updateItem(itemDto, userIdNew, itemId);
-        Assertions.assertThrows(BookingPropertiesException.class, () -> {
+        assertThrows(BookingPropertiesException.class, () -> {
             bookingService.updateBooking(bookerId, userIdNew, false);
         });
-        itemDto.setAvailable(true);
-        itemService.updateItem(itemDto, userIdNew, itemId);
     }
 
     @Test
@@ -154,10 +179,10 @@ class BookingServiceDaoTest {
         assertThat(booker.getEnd(), equalTo(bookingDtoInfoDao.getEnd()));
         assertThat(booker.getItem(), equalTo(bookingDtoInfoDao.getItem()));
         assertThat(booker.getBooker(), equalTo(bookingDtoInfoDao.getBooker()));
-        Assertions.assertThrows(BookingExistException.class, () -> {
+        assertThrows(BookingExistException.class, () -> {
             bookingService.getBooking(1000, bookerId);
         });
-        Assertions.assertThrows(UserExistException.class, () -> {
+        assertThrows(UserExistException.class, () -> {
             bookingService.getBooking(bookingDtoInfo.getId(), 10000);
         });
     }
@@ -197,9 +222,9 @@ class BookingServiceDaoTest {
         int ownerId = itemRepository.findAll().get(0).getOwner().getId();
 
         List<BookingDtoInfo> bookingDtoList = bookingService.getBookingByUserIdAndState(bookerId, "CURRENT", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(3));
+        assertThat(bookingDtoList.size(), equalTo(2));
         bookingDtoList = bookingService.getBookingByUserIdAndState(bookerId, "ALL", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(4));
+        assertThat(bookingDtoList.size(), equalTo(3));
 
         bookingDtoList = bookingService.getBookingByUserIdAndState(bookerId, "FUTURE", pageRequest);
         assertThat(bookingDtoList.size(), equalTo(1));
@@ -208,12 +233,12 @@ class BookingServiceDaoTest {
         bookingDtoList = bookingService.getBookingByUserIdAndState(bookerId, "REJECTED", pageRequest);
         assertThat(bookingDtoList.size(), equalTo(1));
         bookingDtoList = bookingService.getBookingByUserIdAndState(bookerId, "WAITING", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(2));
+        assertThat(bookingDtoList.size(), equalTo(1));
 
-        Assertions.assertThrows(StateCheckException.class, () -> {
+        assertThrows(StateCheckException.class, () -> {
             bookingService.getBookingByUserIdAndState(bookerId, "CURNT", pageRequest);
         });
-        Assertions.assertThrows(UserExistException.class, () -> {
+        assertThrows(UserExistException.class, () -> {
             bookingService.getBookingByUserIdAndState(1000, "FUTURE", pageRequest);
         });
         bookingDtoList = bookingService.getBookingByUserIdAndState(ownerId, "ALL", pageRequest);
@@ -255,9 +280,9 @@ class BookingServiceDaoTest {
         int ownerId = itemRepository.findAll().get(0).getOwner().getId();
 
         List<BookingDtoInfo> bookingDtoList = bookingService.getBookingByOwnerAndState(ownerId, "CURRENT", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(3));
+        assertThat(bookingDtoList.size(), equalTo(2));
         bookingDtoList = bookingService.getBookingByOwnerAndState(ownerId, "ALL", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(4));
+        assertThat(bookingDtoList.size(), equalTo(3));
 
         bookingDtoList = bookingService.getBookingByOwnerAndState(ownerId, "FUTURE", pageRequest);
         assertThat(bookingDtoList.size(), equalTo(1));
@@ -266,12 +291,12 @@ class BookingServiceDaoTest {
         bookingDtoList = bookingService.getBookingByOwnerAndState(ownerId, "REJECTED", pageRequest);
         assertThat(bookingDtoList.size(), equalTo(1));
         bookingDtoList = bookingService.getBookingByOwnerAndState(ownerId, "WAITING", pageRequest);
-        assertThat(bookingDtoList.size(), equalTo(2));
+        assertThat(bookingDtoList.size(), equalTo(1));
 
-        Assertions.assertThrows(StateCheckException.class, () -> {
+        assertThrows(StateCheckException.class, () -> {
             bookingService.getBookingByOwnerAndState(ownerId, "CURNT", pageRequest);
         });
-        Assertions.assertThrows(UserExistException.class, () -> {
+        assertThrows(UserExistException.class, () -> {
             bookingService.getBookingByOwnerAndState(1000, "PAST", pageRequest);
         });
     }

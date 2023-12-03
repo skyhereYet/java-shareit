@@ -5,11 +5,18 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoInfo;
+import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.exception.InvalidCommentRequestException;
 import ru.practicum.shareit.exception.ItemExistException;
+import ru.practicum.shareit.exception.ItemRequestExistException;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemInfoDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.dto.ItemRequestInfo;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
@@ -21,6 +28,7 @@ import ru.practicum.shareit.user.service.UserService;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -41,6 +49,8 @@ class ItemServiceDaoTest {
     private final UserService userService;
     @Autowired
     private final ItemRequestService itemRequestService;
+    @Autowired
+    private final BookingService bookingService;
 
     @Test
     @DisplayName("ItemServiceDao: method - createItem (should_createItem_successfully)")
@@ -70,6 +80,11 @@ class ItemServiceDaoTest {
         assertThat(item.getDescription(), equalTo(itemDtoDao.getDescription()));
         assertThat(item.getName(), equalTo(itemDtoDao.getName()));
         assertThat(item.getAvailable(), equalTo(itemDtoDao.getAvailable()));
+
+        itemDto.setRequestId(2);
+        assertThrows(ItemRequestExistException.class, () -> {
+            itemService.createItem(itemDto, userDao.getId());
+        });
     }
 
     @Test
@@ -151,10 +166,10 @@ class ItemServiceDaoTest {
     @Rollback(value = false)
     void should_getItemsBySubstring_successfully() {
         List<ItemDto> itemDtoList = itemService.getItemsBySubstring("angle");
-        assertThat(itemDtoList.size(), equalTo(3));
+        assertThat(itemDtoList.size(), equalTo(2));
         TypedQuery<Item> query = entityManager.createQuery("Select i from Item i where i.description = :description", Item.class);
         List<Item> itemQuery = query.setParameter("description", itemDtoList.get(0).getDescription()).getResultList();
-        assertThat(itemQuery.size(), equalTo(1));
+        assertThat(itemQuery.size(), equalTo(2));
 
         itemDtoList = itemService.getItemsBySubstring("");
         assertThat(itemDtoList.size(), equalTo(0));
@@ -167,6 +182,8 @@ class ItemServiceDaoTest {
     void should_createComment_successfully() {
         UserDto userDto = new UserDto(0, "First user", "commented@email.com");
         UserDto userDao = userService.createOrThrow(userDto);
+        UserDto bookerDto = new UserDto(0, "Booker user", "booker_comment@email.com");
+        UserDto bookerDao = userService.createOrThrow(bookerDto);
         ItemDto itemDto = new ItemDto();
         itemDto.setId(0);
         itemDto.setName("Black angle");
@@ -174,12 +191,36 @@ class ItemServiceDaoTest {
         itemDto.setAvailable(true);
         itemDto.setRequestId(null);
         ItemDto itemDtoDao = itemService.createItem(itemDto, userDao.getId());
+        BookingDto bookingDto = new BookingDto(
+                0,
+                LocalDateTime.now().minusHours(1),
+                LocalDateTime.now(),
+                itemDtoDao.getId(),
+                bookerDao.getId(),
+                BookingStatus.APPROVED);
+        BookingDtoInfo bookingDtoInfoDao = bookingService.createBooking(bookingDto, bookerDao.getId());
 
         CommentDto commentDto = new CommentDto();
         commentDto.setText("text comment");
+        CommentDto commentDtoDao = itemService.createComment(itemDtoDao.getId(), bookerDao.getId(), commentDto);
+
+        TypedQuery<Comment> query = entityManager.createQuery("Select c from Comment c where c.text = :description", Comment.class);
+        List<Comment> commentQuery = query.setParameter("description", commentDto.getText()).getResultList();
+        assertThat(commentQuery.size(), equalTo(1));
 
         assertThrows(ItemExistException.class, () -> {
             itemService.createComment(1111, userDao.getId(), commentDto);
+        });
+
+        assertThrows(UserExistException.class, () -> {
+            itemService.createComment(itemDtoDao.getId(), 1111111, commentDto);
+        });
+
+        UserDto userDto2 = new UserDto(0, "First user", "commented2@email.com");
+        UserDto userDao2 = userService.createOrThrow(userDto2);
+
+        assertThrows(InvalidCommentRequestException.class, () -> {
+            itemService.createComment(itemDtoDao.getId(), userDao.getId(), commentDto);
         });
     }
 }

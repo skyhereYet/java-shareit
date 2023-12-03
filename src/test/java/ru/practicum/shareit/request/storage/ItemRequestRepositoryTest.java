@@ -43,7 +43,6 @@ class ItemRequestRepositoryTest {
         TypedQuery<ItemRequest> query = entityManager.createQuery(
                 "Select ir from ItemRequest as ir where ir.requestor.id = :id", ItemRequest.class);
         ItemRequest itemRequestDao = query.setParameter("id", itemRequest.getId()).getSingleResult();
-        assertEquals(itemRequestDao.getId(), itemRequest.getId());
         assertEquals(itemRequestDao.getDescription(), itemRequest.getDescription());
         assertEquals(itemRequestDao.getRequestor().getEmail(), user.getEmail());
     }

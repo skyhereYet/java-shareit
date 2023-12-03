@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.exception.EmailExistException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -62,18 +63,35 @@ public class UserControllerTest {
     @DisplayName("should_createUser_throwError")
     void should_createUser_throwError() throws Exception {
         UserDto userDto = new UserDto(1, "r", "r");
-        User user = new User(1, "First", "first@email.com");
+        UserDto userDto2 = new UserDto(2, "First", "first@email.com");
 
         when(userService.createOrThrow(any()))
                 .thenThrow(ConstraintViolationException.class);
 
         mockMvc.perform(post("/users")
-                        .header("X-Sharer-User-Id", user.getId())
+                        .header("X-Sharer-User-Id", userDto.getId())
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(userDto)))
                 .andExpect(status().is(400));
+    }
+
+    @Test
+    @DisplayName("should_createUser_throwEmailException")
+    void should_createUser_throwEmailException() throws Exception {
+        UserDto userDto1 = new UserDto(1, "First", "first@email.com");
+
+        when(userService.createOrThrow(any()))
+                .thenThrow(EmailExistException.class);
+
+        mockMvc.perform(post("/users")
+                        .header("X-Sharer-User-Id", userDto1.getId())
+                        .characterEncoding(StandardCharsets.UTF_8)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(userDto1)))
+                .andExpect(status().is(409));
     }
 
     @Test

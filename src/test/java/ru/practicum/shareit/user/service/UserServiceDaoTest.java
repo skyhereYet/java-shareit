@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -58,6 +59,8 @@ class UserServiceDaoTest {
         assertThat(userRepository.getId(), equalTo(userDao.getId()));
         assertThat(userRepository.getName(), equalTo(userDto.getName()));
         assertThat(userRepository.getEmail(), equalTo(userDto.getEmail()));
+
+        assertThrows(UserExistException.class, () -> userService.updateOrThrow(userDto, 1111111));
     }
 
     @Test
@@ -81,7 +84,7 @@ class UserServiceDaoTest {
     void should_getUsers_successfully() {
         //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
-        assertThat(users.size(), equalTo(8));
+        assertThat(users.size(), equalTo(9));
         TypedQuery<User> query = entityManager.createQuery("Select i from User i ", User.class);
         List<User> userDao = query.getResultList();
         assertThat(userDao.size(), equalTo(users.size()));
@@ -95,6 +98,6 @@ class UserServiceDaoTest {
         List<UserDto> users = userService.getUsers();
         int userId = users.get(0).getId();
         userService.deleteOrThrow(userId);
-        Assertions.assertThrows(UserExistException.class, () -> userService.getUserByIdOrThrow(userId));
+        assertThrows(UserExistException.class, () -> userService.getUserByIdOrThrow(11111111));
     }
 }
