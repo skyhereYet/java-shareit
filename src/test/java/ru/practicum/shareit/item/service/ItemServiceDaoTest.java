@@ -99,7 +99,7 @@ class ItemServiceDaoTest {
         Item itemQuery = query.setParameter("id", itemDtoDao.getId()).getSingleResult();
         assertThat(itemQuery.getAvailable(), equalTo(itemDtoDao.getAvailable()));
         assertThrows(UserExistException.class, () -> {
-            itemService.updateItem(itemDtoSearch, 10, 10);
+            itemService.updateItem(itemDtoSearch, itemDtoSearch.getId(), 10000);
         });
         assertThrows(ItemExistException.class, () -> {
             itemService.updateItem(itemDtoSearch, 11111, userDao.getId());
