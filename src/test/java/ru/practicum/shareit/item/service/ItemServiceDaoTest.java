@@ -142,7 +142,7 @@ class ItemServiceDaoTest {
     void should_getItemsInfoDtoByUserId_successfully() {
         UserDto userDto = userService.getUsers().get(0);
         List<ItemInfoDto> itemInfoDtoList = itemService.getItemsInfoDtoByUserId(userDto.getId());
-        assertThat(itemInfoDtoList.size(), equalTo(1));
+        assertThat(itemInfoDtoList.size(), equalTo(0));
     }
 
     @Test

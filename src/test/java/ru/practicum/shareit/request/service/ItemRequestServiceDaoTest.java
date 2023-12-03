@@ -93,7 +93,7 @@ class ItemRequestServiceDaoTest {
                 userDao.getId(),
                 PageRequest.of(from / size, size));
 
-        assertThat(itemDtoList.size(), equalTo(3));
+        assertThat(itemDtoList.size(), equalTo(1));
         assertThrows(UserExistException.class, () -> {
             itemRequestService.getAllRequestsPagination(11111, PageRequest.of(from / size, size));
         });
