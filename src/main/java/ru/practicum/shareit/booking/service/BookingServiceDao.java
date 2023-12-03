@@ -49,7 +49,9 @@ public class BookingServiceDao implements BookingService {
             throw new BookingPropertiesException("The item unvailable");
         }
         Booking booking = BookingMapper.toBooking(bookingDto, item, user);
-        booking.setStatus(BookingStatus.WAITING);
+        if (booking.getStatus() == null) {
+            booking.setStatus(BookingStatus.WAITING);
+        }
         return BookingMapper.toBookingDtoInfo(bookingRepository.save(booking));
     }
 

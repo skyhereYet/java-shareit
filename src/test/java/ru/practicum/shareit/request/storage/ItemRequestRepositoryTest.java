@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@DisplayName("ItemRequestRepository")
+@DisplayName("Test: ItemRequestRepository")
 class ItemRequestRepositoryTest {
 
     private final EntityManager entityManager;

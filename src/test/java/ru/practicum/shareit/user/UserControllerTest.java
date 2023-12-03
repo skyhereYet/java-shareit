@@ -41,7 +41,7 @@ public class UserControllerTest {
     @DisplayName("should_createUser_successfully")
     void should_createUser_successfully() throws Exception {
         UserDto userDto = new UserDto(1, "First", "first@email.com");
-        User user = new User(1, "First", "first@email.com");;
+        User user = new User(1, "First", "first@email.com");
 
         when(userService.createOrThrow(any()))
                 .thenReturn(userDto);

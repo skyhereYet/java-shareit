@@ -10,6 +10,9 @@ import java.util.List;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Integer> {
 
+    @Query("select i " +
+            "from Item as i " +
+            "where i.owner.id in :userId")
     List<Item> findByOwnerId(int userId);
 
     @Query("select i " +

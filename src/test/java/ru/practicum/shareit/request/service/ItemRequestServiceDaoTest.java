@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
-@DisplayName("ItemRequestService")
+@DisplayName("Test: ItemRequestService")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ItemRequestServiceDaoTest {
 
@@ -62,9 +62,13 @@ class ItemRequestServiceDaoTest {
     @DisplayName("ItemRequestServiceDao: method - getAllRequest (should_getAllRequest_successfully)")
     @Order(value = 2)
     void should_getAllRequest_successfully() {
-        List<UserDto> usersDtoList = userService.getUsers();
-        int userId = usersDtoList.get(0).getId();
-        List<ItemRequestInfo> itemRequestDtoList = itemRequestService.getAllRequest(userId);
+        UserDto userDto = new UserDto(0, "First user", "getAllRequest@email.com");
+        UserDto userDao;
+        userDao = userService.createOrThrow(userDto);
+        ItemRequest itemRequest = new ItemRequest(0, "Black angle", null, null);
+        ItemRequestDto itemRequestDtoDao = itemRequestService.createRequest(
+                ItemRequestMapper.toItemRequestDto(itemRequest), userDao.getId());
+        List<ItemRequestInfo> itemRequestDtoList = itemRequestService.getAllRequest(userDao.getId());
 
         assertThat(itemRequestDtoList.size(), equalTo(1));
         assertThrows(UserExistException.class, () -> {
@@ -76,15 +80,20 @@ class ItemRequestServiceDaoTest {
     @DisplayName("ItemRequestServiceDao: method - getAllRequestsPagination (should_getAllRequestsPagination_successfully)")
     @Order(value = 3)
     void should_getAllRequestsPagination_successfully() {
-        List<UserDto> usersDtoList = userService.getUsers();
-        int userId = usersDtoList.get(0).getId();
+        UserDto userDto = new UserDto(0, "First user", "getAllRequestsPagination@email.com");
+        UserDto userDao;
+        userDao = userService.createOrThrow(userDto);
+        ItemRequest itemRequest = new ItemRequest(0, "Black angle", null, null);
+        ItemRequestDto itemRequestDtoDao = itemRequestService.createRequest(
+                ItemRequestMapper.toItemRequestDto(itemRequest), userDao.getId());
+
         int from = 0;
         int size = 10;
         List<ItemRequestInfo> itemDtoList = itemRequestService.getAllRequestsPagination(
-                userId,
+                userDao.getId(),
                 PageRequest.of(from / size, size));
 
-        assertThat(itemDtoList.size(), equalTo(0));
+        assertThat(itemDtoList.size(), equalTo(1));
         assertThrows(UserExistException.class, () -> {
             itemRequestService.getAllRequestsPagination(10, PageRequest.of(from / size, size));
         });
@@ -94,14 +103,19 @@ class ItemRequestServiceDaoTest {
     @DisplayName("ItemRequestServiceDao: method - getRequestById (should_getRequestById_successfully)")
     @Order(value = 4)
     void should_getRequestById_successfully() {
-        List<UserDto> usersDtoList = userService.getUsers();
-        int userId = usersDtoList.get(0).getId();
-        List<ItemRequestInfo> itemRequestDtoList = itemRequestService.getAllRequest(userId);
+        UserDto userDto = new UserDto(0, "First user", "getRequestById@email.com");
+        UserDto userDao;
+        userDao = userService.createOrThrow(userDto);
+        ItemRequest itemRequest = new ItemRequest(0, "Black angle", null, null);
+        ItemRequestDto itemRequestDtoDao = itemRequestService.createRequest(
+                ItemRequestMapper.toItemRequestDto(itemRequest), userDao.getId());
+
+        List<ItemRequestInfo> itemRequestDtoList = itemRequestService.getAllRequest(userDao.getId());
         int requestId = itemRequestDtoList.get(0).getId();
-        ItemRequestInfo itemRequestInfo = itemRequestService.getRequestById(userId, requestId);
+        ItemRequestInfo itemRequestInfo = itemRequestService.getRequestById(userDao.getId(), requestId);
         TypedQuery<ItemRequest> query = entityManager.createQuery("Select i from ItemRequest i where i.id = :id",
                 ItemRequest.class);
-        ItemRequest itemRequestDao = query.setParameter("id", userId).getSingleResult();
+        ItemRequest itemRequestDao = query.setParameter("id", itemRequestDtoDao.getId()).getSingleResult();
 
         assertThat(itemRequestInfo.getDescription(), equalTo(itemRequestDao.getDescription()));
         assertThat(itemRequestInfo.getId(), equalTo(itemRequestDao.getId()));
