@@ -77,16 +77,32 @@ class ItemServiceDaoTest {
     @Order(value = 2)
     @Rollback(value = false)
     void should_updateItem_successfully() {
-        ItemDto itemDto = itemService.getItemsBySubstring("Black angle").get(0);
-        ItemDto itemDtoDao = itemService.updateItem(itemDto, itemDto.getId(), 3);
+        UserDto userDto = new UserDto(0, "First user", "should_updateItem_successfully@email.com");
+        UserDto userDao = userService.createOrThrow(userDto);
+        UserDto userRequestDtoDao = userService.createOrThrow(new UserDto(0, "For request", "itemRequest@email.com"));
+        ItemRequest itemRequest = new ItemRequest(0, "Black angle_new", null, null);
+        itemRequestService.createRequest(
+                ItemRequestMapper.toItemRequestDto(itemRequest), userRequestDtoDao.getId());
+
+        List<ItemRequestInfo> ir = itemRequestService.getAllRequest(userRequestDtoDao.getId());
+        ItemDto itemDto = new ItemDto();
+        itemDto.setId(0);
+        itemDto.setName("Black angle");
+        itemDto.setDescription("Black angle and coal");
+        itemDto.setAvailable(true);
+        itemDto.setRequestId(ir.get(0).getId());
+        ItemDto itemDtoDao = itemService.createItem(itemDto, userDao.getId());
+
+        ItemDto itemDtoSearch = itemService.getItemsBySubstring("Black angle").get(0);
+        itemDtoDao = itemService.updateItem(itemDto, itemDtoDao.getId(), userDao.getId());
         TypedQuery<Item> query = entityManager.createQuery("Select i from Item i where i.id = :id", Item.class);
-        Item itemQuery = query.setParameter("id", itemDto.getId()).getSingleResult();
+        Item itemQuery = query.setParameter("id", itemDtoDao.getId()).getSingleResult();
         assertThat(itemQuery.getAvailable(), equalTo(itemDtoDao.getAvailable()));
         assertThrows(UserExistException.class, () -> {
-            itemService.updateItem(itemDto, 10, 10);
+            itemService.updateItem(itemDtoSearch, 10, 10);
         });
         assertThrows(ItemExistException.class, () -> {
-            itemService.updateItem(itemDto, 10, 3);
+            itemService.updateItem(itemDtoSearch, 11111, userDao.getId());
         });
     }
 
