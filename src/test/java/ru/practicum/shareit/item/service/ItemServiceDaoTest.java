@@ -151,7 +151,7 @@ class ItemServiceDaoTest {
     @Rollback(value = false)
     void should_getItemsBySubstring_successfully() {
         List<ItemDto> itemDtoList = itemService.getItemsBySubstring("angle");
-        assertThat(itemDtoList.size(), equalTo(2));
+        assertThat(itemDtoList.size(), equalTo(3));
         TypedQuery<Item> query = entityManager.createQuery("Select i from Item i where i.description = :description", Item.class);
         List<Item> itemQuery = query.setParameter("description", itemDtoList.get(0).getDescription()).getResultList();
         assertThat(itemQuery.size(), equalTo(1));

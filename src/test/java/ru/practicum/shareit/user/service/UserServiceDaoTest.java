@@ -81,7 +81,7 @@ class UserServiceDaoTest {
     void should_getUsers_successfully() {
         //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
-        assertThat(users.size(), equalTo(7));
+        assertThat(users.size(), equalTo(8));
         TypedQuery<User> query = entityManager.createQuery("Select i from User i ", User.class);
         List<User> userDao = query.getResultList();
         assertThat(userDao.size(), equalTo(users.size()));
