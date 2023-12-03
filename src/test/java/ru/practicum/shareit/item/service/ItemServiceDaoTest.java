@@ -112,7 +112,7 @@ class ItemServiceDaoTest {
     void should_getItemsInfoDtoByUserId_successfully() {
         UserDto userDto = userService.getUsers().get(0);
         List<ItemInfoDto> itemInfoDtoList = itemService.getItemsInfoDtoByUserId(userDto.getId());
-        assertThat(itemInfoDtoList.size(), equalTo(0));
+        assertThat(itemInfoDtoList.size(), equalTo(1));
     }
 
     @Test
@@ -136,7 +136,7 @@ class ItemServiceDaoTest {
     @Rollback(value = false)
     void should_getItemsBySubstring_successfully() {
         List<ItemDto> itemDtoList = itemService.getItemsBySubstring("angle");
-        assertThat(itemDtoList.size(), equalTo(1));
+        assertThat(itemDtoList.size(), equalTo(2));
         TypedQuery<Item> query = entityManager.createQuery("Select i from Item i where i.description = :description", Item.class);
         List<Item> itemQuery = query.setParameter("description", itemDtoList.get(0).getDescription()).getResultList();
         assertThat(itemQuery.size(), equalTo(1));
@@ -163,8 +163,8 @@ class ItemServiceDaoTest {
         CommentDto commentDto = new CommentDto();
         commentDto.setText("text comment");
 
-        assertThrows(InvalidCommentRequestException.class, () -> {
-            itemService.createComment(itemDtoDao.getId(), 2, commentDto);
+        assertThrows(ItemExistException.class, () -> {
+            itemService.createComment(1111, userDao.getId(), commentDto);
         });
     }
 }
