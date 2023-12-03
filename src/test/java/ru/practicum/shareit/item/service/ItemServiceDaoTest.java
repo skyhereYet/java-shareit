@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import ru.practicum.shareit.exception.InvalidCommentRequestException;
 import ru.practicum.shareit.exception.ItemExistException;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.item.dto.CommentDto;
