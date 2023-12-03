@@ -77,9 +77,9 @@ class ItemServiceDaoTest {
     @Order(value = 2)
     @Rollback(value = false)
     void should_updateItem_successfully() {
-        UserDto userDto = new UserDto(0, "First user", "should_updateItem_successfully@email.com");
+        UserDto userDto = new UserDto(0, "First user", "should_updateItem123@email.com");
         UserDto userDao = userService.createOrThrow(userDto);
-        UserDto userRequestDtoDao = userService.createOrThrow(new UserDto(0, "For request", "itemRequest@email.com"));
+        UserDto userRequestDtoDao = userService.createOrThrow(new UserDto(0, "For request", "should_updateItem_successfully@email.com"));
         ItemRequest itemRequest = new ItemRequest(0, "Black angle_new", null, null);
         itemRequestService.createRequest(
                 ItemRequestMapper.toItemRequestDto(itemRequest), userRequestDtoDao.getId());
