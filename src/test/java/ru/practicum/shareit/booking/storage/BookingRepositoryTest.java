@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
@@ -42,11 +41,7 @@ class BookingRepositoryTest {
     LocalDateTime start = LocalDateTime.now();
     LocalDateTime end = LocalDateTime.now().plusHours(2);
 
-    //@BeforeEach
     void beforeEach() {
-        //itemRepository.deleteAll();
-        //bookingRepository.deleteAll();
-        //userRepository.deleteAll();
         Random random = new Random();
         String generatedEmail = "generate" + (random.nextInt(100) * random.nextInt(100)) + "@email.com";
 
@@ -85,7 +80,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByBooker (should_findAllByBooker_successfully)")
     @Order(1)
-    @Rollback(value = false)
     void should_findAllByBooker_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -96,7 +90,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByBookerAndStartGreaterThan (should_findAllByBookerAndStartGreaterThan_successfully)")
     @Order(2)
-    @Rollback(value = false)
     void should_findAllByBookerAndStartGreaterThan_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -108,7 +101,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByBookerAndStartBefore (should_findAllByBookerAndStartBefore_successfully)")
     @Order(3)
-    @Rollback(value = false)
     void should_findAllByBookerAndStartBefore_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -120,7 +112,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByBookerAndStatus (should_findAllByBookerAndStatus_successfully)")
     @Order(4)
-    @Rollback(value = false)
     void should_findAllByBookerAndStatus_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -133,7 +124,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerAndStatus (should_findAllByItemOwnerAndStatus_successfully)")
     @Order(4)
-    @Rollback(value = false)
     void should_findAllByItemOwnerAndStatus_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -146,7 +136,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemAndBookerAndEndBeforeOrderByStart (should_findAllByItemAndBookerAndEndBeforeOrderByStart_successfully)")
     @Order(5)
-    @Rollback(value = false)
     void should_findAllByItemAndBookerAndEndBeforeOrderByStart_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -161,7 +150,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerStartDescPageable (should_findAllByItemOwnerStartDescPageable_successfully)")
     @Order(6)
-    @Rollback(value = false)
     void should_findAllByItemOwnerStartDescPageable_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -175,7 +163,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerStartDesc (should_findAllByItemOwnerStartDesc_successfully)")
     @Order(7)
-    @Rollback(value = false)
     void should_findAllByItemOwnerStartDesc_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -187,7 +174,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerAndStartGreaterThanOrderByStart (findAllByItemOwnerAndStartGreaterThanOrderByStart)")
     @Order(8)
-    @Rollback(value = false)
     void should_findAllByItemOwnerAndStartGreaterThanOrderByStart_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -201,7 +187,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerAndStartBefore (should_findAllByItemOwnerAndStartBefore_successfully)")
     @Order(9)
-    @Rollback(value = false)
     void should_findAllByItemOwnerAndStartBefore_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -215,7 +200,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItem_IdAndStatusOrderByStart (should_findAllByItem_IdAndStatusOrderByStart_successfully)")
     @Order(10)
-    @Rollback(value = false)
     void should_findAllByItem_IdAndStatusOrderByStart_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -229,7 +213,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByBookerAndCurrent (should_findAllByBookerAndCurrent_successfully)")
     @Order(11)
-    @Rollback(value = false)
     void should_findAllByBookerAndCurrent_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();
@@ -244,7 +227,6 @@ class BookingRepositoryTest {
     @Test
     @DisplayName("BookingRepository: method - findAllByItemOwnerAndCurrent (should_findAllByItemOwnerAndCurrent_successfully)")
     @Order(12)
-    @Rollback(value = false)
     void should_findAllByItemOwnerAndCurrent_successfully() {
         beforeEach();
         List<Booking> bookingList = bookingRepository.findAll();

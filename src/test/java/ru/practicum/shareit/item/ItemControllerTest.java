@@ -113,13 +113,13 @@ class ItemControllerTest {
     @DisplayName("ItemController: method - getItemsByUserId (should_getItemsByUserId_successfully)")
     void should_getItemsByUserId_successfully() throws Exception {
         List<ItemInfoDto> list = Collections.emptyList();
-        when(itemService.getItemsInfoDtoByUserId(anyInt()))
+        when(itemService.getItemsInfoDtoByUserId(anyInt(), any()))
                 .thenReturn(list);
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", 1))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(list)));
-        verify(itemService, times(1)).getItemsInfoDtoByUserId(anyInt());
+        verify(itemService, times(1)).getItemsInfoDtoByUserId(anyInt(), any());
     }
 
     @Test
@@ -146,12 +146,15 @@ class ItemControllerTest {
     @Test
     @DisplayName("ItemController: method - searchItem (should_searchItem_successfully)")
     void should_searchItem_successfully() throws Exception {
+        int from = 0;
+        int size = 10;
+
         List<ItemDto> list = Collections.emptyList();
-        when(itemService.getItemsBySubstring(anyString()))
+        when(itemService.getItemsBySubstring(any(), any()))
                 .thenReturn(list);
         mockMvc.perform(get("/items/search")
                         .header("X-Sharer-User-Id", 1)
-                        .param("text", anyString()))
+                        .param("text", "text"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(mapper.writeValueAsString(list)));
     }

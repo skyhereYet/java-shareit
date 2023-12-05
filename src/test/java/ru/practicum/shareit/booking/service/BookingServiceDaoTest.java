@@ -5,7 +5,6 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoInfo;
 import ru.practicum.shareit.booking.model.Booking;
@@ -68,7 +67,6 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 1)
     @DisplayName("ItemRequestServiceDao: method - createBooking (should_createBooking_successfully)")
-    @Rollback(true)
     void should_createBooking_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();
@@ -121,7 +119,6 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 2)
     @DisplayName("ItemRequestServiceDao: method - updateBooking (should_updateBooking_successfully)")
-    @Rollback(value = true)
     void should_updateBooking_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();
@@ -159,7 +156,6 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 2)
     @DisplayName("ItemRequestServiceDao: method - getBooking (should_getBooking_successfully)")
-    @Rollback(value = true)
     void should_getBooking_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();
@@ -190,7 +186,6 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 3)
     @DisplayName("ItemRequestServiceDao: method - getBookingByUserIdAndState (should_getBookingByUserIdAndState_successfully)")
-    @Rollback(value = true)
     void should_getBookingByUserIdAndState_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();
@@ -248,7 +243,6 @@ class BookingServiceDaoTest {
     @Test
     @Order(value = 3)
     @DisplayName("ItemRequestServiceDao: method - getBookingByOwnerAndState (should_getBookingByOwnerAndState_successfully)")
-    @Rollback(value = true)
     void should_getBookingByOwnerAndState_successfully() {
         beforeEach();
         BookingDto bookingDto = new BookingDto();

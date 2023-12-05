@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.storage.ItemRequestRepository;
@@ -34,7 +34,6 @@ class ItemRepositoryTest {
     @Test
     @DisplayName("ItemRequestRepository: method - findByOwnerId (should_findByOwnerId_successfully)")
     @Order(1)
-    @Rollback(value = true)
     void should_findByOwnerId_successfully() {
         User user = userRepository.save(new User(
                 0,
@@ -56,7 +55,7 @@ class ItemRepositoryTest {
                 true,
                 owner,
                 itemRequest));
-        List<Item> itemList = itemRepository.findByOwnerId(owner.getId());
+        List<Item> itemList = itemRepository.findByOwnerId(owner.getId(), PageRequest.of(0 / 10, 10));
         assertEquals(itemList.size(), 1);
         assertEquals(itemList.get(0).getId(), item.getId());
         assertEquals(itemList.get(0).getDescription(), item.getDescription());
@@ -73,7 +72,6 @@ class ItemRepositoryTest {
     @Test
     @DisplayName("ItemRequestRepository: method - findItemsByRequest (should_findItemsByRequest_successfully)")
     @Order(2)
-    @Rollback(value = true)
     void should_findItemsByRequest_successfully() {
         User user = userRepository.save(new User(
                 0,
@@ -95,7 +93,7 @@ class ItemRepositoryTest {
                 true,
                 owner,
                 itemRequest));
-        List<Item> itemList = itemRepository.findItemsByRequest("something");
+        List<Item> itemList = itemRepository.findItemsByRequest("something", PageRequest.of(0 / 10, 10));
         assertEquals(itemList.size(), 1);
         assertEquals(itemList.get(0).getId(), item.getId());
         assertEquals(itemList.get(0).getDescription(), item.getDescription());

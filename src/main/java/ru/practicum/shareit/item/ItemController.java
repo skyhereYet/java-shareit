@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -44,9 +45,11 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemInfoDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId) {
+    public List<ItemInfoDto> getItemsByUserId(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
+                                              @Min(0) @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                              @Min(1) @RequestParam(name = "size", defaultValue = "20") Integer size) {
         log.info("GET request. Get items by user ID - " + userId);
-        return itemService.getItemsInfoDtoByUserId(userId);
+        return itemService.getItemsInfoDtoByUserId(userId, PageRequest.of(from / size, size));
     }
 
     @GetMapping(value = "/{itemId}")
@@ -57,9 +60,11 @@ public class ItemController {
     }
 
     @GetMapping(value = "/search")
-    public List<ItemDto> searchItem(@RequestParam String text) {
+    public List<ItemDto> searchItem(@RequestParam String text,
+                                    @Min(0) @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                    @Min(1) @RequestParam(name = "size", defaultValue = "20") Integer size) {
         log.info("GET request. Search items by substring - " + text);
-        return itemService.getItemsBySubstring(text);
+        return itemService.getItemsBySubstring(text, PageRequest.of(from / size, size));
     }
 
     @PostMapping(value = "/{itemId}/comment")

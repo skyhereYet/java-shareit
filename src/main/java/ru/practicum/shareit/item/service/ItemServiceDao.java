@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -82,10 +83,10 @@ public class ItemServiceDao implements ItemService {
     }
 
     @Override
-    public List<ItemInfoDto> getItemsInfoDtoByUserId(int userId) {
-        List<Item> items = itemRepository.findByOwnerId(userId);
+    public List<ItemInfoDto> getItemsInfoDtoByUserId(int userId, Pageable pageable) {
+        List<Item> items = itemRepository.findByOwnerId(userId, pageable);
         List<Booking> bookingList = bookingRepository.findAllByItemOwnerStartDesc(userId);
-        List<Comment> comments = new ArrayList<>();//commentRepository.findCommentByAuthorOrderByCreated()
+        List<Comment> comments = new ArrayList<>();
         return items.stream()
                 .sorted(Comparator.comparingInt(Item::getId))
                 .map(i -> ItemMapper.toItemInfoDto(i, bookingList, comments))
@@ -105,12 +106,12 @@ public class ItemServiceDao implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsBySubstring(String text) {
+    public List<ItemDto> getItemsBySubstring(String text, Pageable pageable) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
         text = "%" + text + "%";
-        return itemRepository.findItemsByRequest(text)
+        return itemRepository.findItemsByRequest(text, pageable)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

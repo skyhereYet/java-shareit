@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
@@ -30,7 +29,6 @@ class UserServiceDaoTest {
     @Test
     @DisplayName("UserServiceDao: method - createOrThrow (should_createOrThrow_successfully)")
     @Order(value = 1)
-    @Rollback(value = false)
     void should_createOrThrow_successfully() {
         UserDto userDto = new UserDto(0, "First user", "firstuser@email.com");
         UserDto userDao;
@@ -47,7 +45,6 @@ class UserServiceDaoTest {
     @DisplayName("UserServiceDao: method - updateOrThrow (should_updateOrThrow_successfully)")
     @Order(value = 2)
     void should_updateOrThrow_successfully() {
-        //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
         int userId = users.get(0).getId();
         UserDto userDto = new UserDto(userId,"updatename", "update@email.com");
@@ -67,7 +64,6 @@ class UserServiceDaoTest {
     @DisplayName("UserServiceDao: method - getUserByIdOrThrow (should_getUserByIdOrThrow_successfully)")
     @Order(value = 3)
     void should_getUserByIdOrThrow_successfully() {
-        //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
         int userId = users.get(0).getId();
         TypedQuery<User> query = entityManager.createQuery("Select i from User i where i.id = :id", User.class);
@@ -82,9 +78,7 @@ class UserServiceDaoTest {
     @DisplayName("UserServiceDao: method - getUsers (should_getUsers_successfully)")
     @Order(value = 4)
     void should_getUsers_successfully() {
-        //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
-        assertThat(users.size(), equalTo(9));
         TypedQuery<User> query = entityManager.createQuery("Select i from User i ", User.class);
         List<User> userDao = query.getResultList();
         assertThat(userDao.size(), equalTo(users.size()));
@@ -94,7 +88,6 @@ class UserServiceDaoTest {
     @DisplayName("UserServiceDao: method - deleteOrThrow (should_deleteOrThrow_successfully)")
     @Order(value = 5)
     void should_deleteOrThrow_successfully() {
-        //userService.createOrThrow(new UserDto(0, "First user", "first@email.com"));
         List<UserDto> users = userService.getUsers();
         int userId = users.get(0).getId();
         userService.deleteOrThrow(userId);

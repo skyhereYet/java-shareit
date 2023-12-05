@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
@@ -33,24 +32,21 @@ class ItemRequestRepositoryTest {
     @Test
     @DisplayName("ItemRequestRepository: method - getAllByUserId (should_getAllByUserId_successfully)")
     @Order(1)
-    @Rollback(value = true)
     void should_getAllByUserId_successfully() {
-        User user = new User(1, "First", "first@email.com");
-        ItemRequest itemRequest = new ItemRequest(1, "Need a brush", user, LocalDateTime.now());
-        userRepository.save(user);
+        User userDao = userRepository.save(new User(1, "User", "getAllByUserId@email.com"));
+        ItemRequest itemRequest = new ItemRequest(1, "Need a brush", userDao, LocalDateTime.now());
         itemRequestRepository.save(itemRequest);
 
         TypedQuery<ItemRequest> query = entityManager.createQuery(
                 "Select ir from ItemRequest as ir where ir.requestor.id = :id", ItemRequest.class);
-        ItemRequest itemRequestDao = query.setParameter("id", itemRequest.getId()).getSingleResult();
+        ItemRequest itemRequestDao = query.setParameter("id", itemRequest.getRequestor().getId()).getSingleResult();
         assertEquals(itemRequestDao.getDescription(), itemRequest.getDescription());
-        assertEquals(itemRequestDao.getRequestor().getEmail(), user.getEmail());
+        assertEquals(itemRequestDao.getRequestor().getEmail(), userDao.getEmail());
     }
 
     @Test
     @DisplayName("ItemRequestRepository: method - getAllAndPageable (should_getAllAndPageable_successfully)")
     @Order(2)
-    @Rollback(value = true)
     void should_getAllAndPageable_successfully() {
         User user = new User(1, "First", "first@email.com");
         ItemRequest itemRequest = new ItemRequest(1, "Need a brush", user, LocalDateTime.now());

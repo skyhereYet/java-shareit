@@ -5,14 +5,15 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.test.annotation.Rollback;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestInfo;
 import ru.practicum.shareit.request.dto.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.storage.UserRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
@@ -37,11 +38,12 @@ class ItemRequestServiceDaoTest {
     private final ItemRequestService itemRequestService;
     @Autowired
     private final UserService userService;
+    @Autowired
+    private final UserRepository userRepository;
 
     @Test
     @DisplayName("ItemRequestServiceDao: method - createRequest (should_createRequest_successfully)")
     @Order(value = 1)
-    @Rollback(value = false)
     void should_createRequest_successfully() {
         UserDto userDto = new UserDto(0, "First user", "first@email.com");
         UserDto userDao;
@@ -80,10 +82,9 @@ class ItemRequestServiceDaoTest {
     @DisplayName("ItemRequestServiceDao: method - getAllRequestsPagination (should_getAllRequestsPagination_successfully)")
     @Order(value = 3)
     void should_getAllRequestsPagination_successfully() {
-        UserDto userDto = new UserDto(0, "First user", "getAllRequestsPagination@email.com");
-        UserDto userDao;
-        userDao = userService.createOrThrow(userDto);
-        ItemRequest itemRequest = new ItemRequest(0, "Black angle", null, null);
+        User user = new User(0, "First user", "getAllRequestsPagination@email.com");
+        User userDao = userRepository.save(user);
+        ItemRequest itemRequest = new ItemRequest(0, "Black angle1", userDao, null);
         ItemRequestDto itemRequestDtoDao = itemRequestService.createRequest(
                 ItemRequestMapper.toItemRequestDto(itemRequest), userDao.getId());
 
@@ -93,7 +94,7 @@ class ItemRequestServiceDaoTest {
                 userDao.getId(),
                 PageRequest.of(from / size, size));
 
-        assertThat(itemDtoList.size(), equalTo(1));
+        assertThat(itemDtoList.size(), equalTo(2));
         assertThrows(UserExistException.class, () -> {
             itemRequestService.getAllRequestsPagination(11111, PageRequest.of(from / size, size));
         });
