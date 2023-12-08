@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
+@Validated
 public class BookingController {
 
     @Autowired
@@ -49,15 +51,19 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoInfo> getBookingByUserIdAndState(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
-                                                           @RequestParam(defaultValue = "ALL") String state) {
+                                                           @RequestParam(defaultValue = "ALL") String state,
+                                                           @Min(0) @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                           @Min(1) @RequestParam(name = "size", defaultValue = "20") Integer size) {
         log.info("GET request. user ID - " + userId);
-        return bookingService.getBookingByUserIdAndState(userId, state);
+        return bookingService.getBookingByUserIdAndState(userId, state, PageRequest.of(from / size, size));
     }
 
     @GetMapping(value = "/owner")
     public List<BookingDtoInfo> getBookingByOwner(@RequestHeader("X-Sharer-User-Id") @Min(1) int userId,
-                                                    @RequestParam(defaultValue = "ALL") String state) {
+                                                  @RequestParam(defaultValue = "ALL") String state,
+                                                  @Min(0) @RequestParam(name = "from", defaultValue = "0") Integer from,
+                                                  @Min(1) @RequestParam(name = "size", defaultValue = "20") Integer size) {
         log.info("GET request. user ID - " + userId + " state - " + state);
-        return bookingService.getBookingByOwnerAndState(userId, state);
+        return bookingService.getBookingByOwnerAndState(userId, state, PageRequest.of(from / size, size));
     }
 }

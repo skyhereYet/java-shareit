@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -9,6 +10,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.storage.BookingRepository;
 import ru.practicum.shareit.exception.InvalidCommentRequestException;
 import ru.practicum.shareit.exception.ItemExistException;
+import ru.practicum.shareit.exception.ItemRequestExistException;
 import ru.practicum.shareit.exception.UserExistException;
 import ru.practicum.shareit.item.CommentMapper;
 import ru.practicum.shareit.item.ItemMapper;
@@ -19,6 +21,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.CommentRepository;
 import ru.practicum.shareit.item.storage.ItemRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.request.storage.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.storage.UserRepository;
 
@@ -36,13 +40,20 @@ public class ItemServiceDao implements ItemService {
     private final ItemRepository itemRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Transactional(readOnly = false)
     @Override
     public ItemDto createItem(ItemDto itemDto, int userId) {
         User owner = userRepository.findById(userId)
                 .orElseThrow(() -> new UserExistException("User not exist in the repository, ID = "  + userId));
-        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, owner, null)));
+        ItemRequest itemRequest = null;
+        if (itemDto.getRequestId() != null) {
+            itemRequest = itemRequestRepository.findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new ItemRequestExistException(
+                            "Request with ID - " + itemDto.getRequestId() + " not found"));
+        }
+        return ItemMapper.toItemDto(itemRepository.save(ItemMapper.toItem(itemDto, owner, itemRequest)));
     }
 
     @Transactional(readOnly = false)
@@ -72,10 +83,10 @@ public class ItemServiceDao implements ItemService {
     }
 
     @Override
-    public List<ItemInfoDto> getItemsInfoDtoByUserId(int userId) {
-        List<Item> items = itemRepository.findByOwnerId(userId);
+    public List<ItemInfoDto> getItemsInfoDtoByUserId(int userId, Pageable pageable) {
+        List<Item> items = itemRepository.findByOwnerId(userId, pageable);
         List<Booking> bookingList = bookingRepository.findAllByItemOwnerStartDesc(userId);
-        List<Comment> comments = new ArrayList<>();//commentRepository.findCommentByAuthorOrderByCreated()
+        List<Comment> comments = new ArrayList<>();
         return items.stream()
                 .sorted(Comparator.comparingInt(Item::getId))
                 .map(i -> ItemMapper.toItemInfoDto(i, bookingList, comments))
@@ -95,12 +106,12 @@ public class ItemServiceDao implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getItemsBySubstring(String text) {
+    public List<ItemDto> getItemsBySubstring(String text, Pageable pageable) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
         text = "%" + text + "%";
-        return itemRepository.findItemsByRequest(text)
+        return itemRepository.findItemsByRequest(text, pageable)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
