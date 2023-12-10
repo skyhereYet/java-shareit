@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import ru.practicum.shareit.util.Create;
 import ru.practicum.shareit.util.Update;
 
 import javax.validation.constraints.Min;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/items")
@@ -59,6 +61,9 @@ public class ItemController {
     public ResponseEntity<Object> searchItem(@RequestParam String text,
                                     @Min(0) @RequestParam(name = "from", defaultValue = "0") Integer from,
                                     @Min(1) @RequestParam(name = "size", defaultValue = "20") Integer size) {
+        if (text.isEmpty() || text.isBlank()) {
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        }
         log.info("GET request. Search items by substring - " + text);
         return itemClient.getItemsBySubstring(text, from, size);
     }

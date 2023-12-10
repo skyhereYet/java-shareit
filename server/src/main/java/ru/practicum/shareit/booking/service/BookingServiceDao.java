@@ -39,7 +39,6 @@ public class BookingServiceDao implements BookingService {
     @Transactional(readOnly = false)
     @Fetch(FetchMode.JOIN)
     public BookingDtoInfo createBooking(BookingDto bookingDto, int userId) {
-        validateBookingDtoTime(bookingDto);
         Item item = itemService.getItemByIdOrThrow(bookingDto.getItemId());
         User user = UserMapper.toUser(userService.getUserByIdOrThrow(userId));
         if (item.getOwner().getId() == userId) {
@@ -150,14 +149,5 @@ public class BookingServiceDao implements BookingService {
         return bookingRepository.findAllByItemOwnerAndStatus(userId, BookingStatus.toBookingStatus(state), pageable).stream()
                 .map(BookingMapper::toBookingDtoInfo)
                 .collect(Collectors.toList());
-    }
-
-    private void validateBookingDtoTime(BookingDto bookingDto) {
-        if (bookingDto.getStart().isEqual(bookingDto.getEnd())) {
-            throw new BookingPropertiesException("Start time is equal end time booking");
-        }
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
-            throw new BookingPropertiesException("Start time is after end");
-        }
     }
 }

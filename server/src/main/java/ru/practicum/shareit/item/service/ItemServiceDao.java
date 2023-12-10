@@ -109,9 +109,6 @@ public class ItemServiceDao implements ItemService {
 
     @Override
     public List<ItemDto> getItemsBySubstring(String text, Pageable pageable) {
-        if (text.isEmpty() || text.isBlank()) {
-            return new ArrayList<>();
-        }
         text = "%" + text + "%";
         return itemRepository.findItemsByRequest(text, pageable)
                 .stream()

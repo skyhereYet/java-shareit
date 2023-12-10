@@ -27,6 +27,12 @@ public class BookingController {
 	@PostMapping
 	public ResponseEntity<Object> createBooking(@RequestHeader("X-Sharer-User-Id") @Min(1) long userId,
 												@Validated({Create.class}) @RequestBody BookingDto bookingDto) {
+		if (bookingDto.getStart().isEqual(bookingDto.getEnd())) {
+			throw new BookingPropertiesException("Start time is equal end time booking");
+		}
+		if (bookingDto.getEnd().isBefore(bookingDto.getStart())) {
+			throw new BookingPropertiesException("Start time is after end");
+		}
 		log.info("GATEWAY: Creating booking {}, userId={}", bookingDto, userId);
 		return bookingClient.createBooking(userId, bookingDto);
 	}
